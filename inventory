@@ -1,1 +1,2 @@
-172.16.20.44 
+[almalinux]
+172.16.20.44 ansible_user=rathanak-alma 
