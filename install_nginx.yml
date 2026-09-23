@@ -1,0 +1,37 @@
+---
+- name: Install and configure Nginx on AlmaLinux
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+
+    - name: Install Nginx
+      ansible.builtin.dnf:
+        name: nginx
+        state: present
+
+    - name: Start and enable Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+
+    - name: Check Nginx service status
+      ansible.builtin.command:
+        cmd: systemctl is-active nginx
+      register: nginx_status
+      changed_when: false
+
+    - name: Test Nginx with curl
+      ansible.builtin.command:
+        cmd: curl -I http://localhost
+      register: nginx_curl
+      changed_when: false
+
+    - name: Display Nginx status
+      ansible.builtin.debug:
+        msg:
+          - "Nginx service status: {{ nginx_status.stdout }}"
+          - "Nginx curl response:"
+          - "{{ nginx_curl.stdout_lines }}"
