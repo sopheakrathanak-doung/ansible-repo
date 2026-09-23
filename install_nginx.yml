@@ -4,34 +4,40 @@
   become: true
   gather_facts: true
 
+
   tasks:
 
-    - name: Install Nginx
-      ansible.builtin.dnf:
-        name: nginx
-        state: present
+  - name: Configure Nginx on AlmaLinux
+    when: ansible_facts.distribution == "AlmaLinux"
+    block:
 
-    - name: Start and enable Nginx
-      ansible.builtin.service:
-        name: nginx
-        state: started
-        enabled: true
+      - name: Install Nginx
+        ansible.builtin.dnf:
+          name: nginx
+          state: present
 
-    - name: Check Nginx service status
-      ansible.builtin.command:
-        cmd: systemctl is-active nginx
-      register: nginx_status
-      changed_when: false
+      - name: Start and enable Nginx
+        ansible.builtin.service:
+          name: nginx
+          state: started
+          enabled: true
 
-    - name: Test Nginx with curl
-      ansible.builtin.command:
-        cmd: curl -I http://localhost
-      register: nginx_curl
-      changed_when: false
+      - name: Check Nginx service status
+        ansible.builtin.command:
+          cmd: systemctl is-active nginx
+        register: nginx_status
+        changed_when: false
 
-    - name: Display Nginx status
-      ansible.builtin.debug:
-        msg:
-          - "Nginx service status: {{ nginx_status.stdout }}"
-          - "Nginx curl response:"
-          - "{{ nginx_curl.stdout_lines }}"
+      - name: Test Nginx with curl
+        ansible.builtin.command:
+          cmd: curl -I http://localhost
+        register: nginx_curl
+        changed_when: false
+
+      - name: Display Nginx status
+        ansible.builtin.debug:
+          msg:
+            - "OS             : {{ ansible_facts.distribution }}"
+            - "Service status : {{ nginx_status.stdout }}"
+            - "Curl response  :"
+            - "{{ nginx_curl.stdout_lines }}"
