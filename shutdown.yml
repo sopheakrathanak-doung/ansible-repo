@@ -1,0 +1,12 @@
+---
+- name: Shutdown Ubuntu and AlmaLinux servers
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Shutdown server
+      ansible.builtin.command: /sbin/shutdown -h now
+      async: 1
+      poll: 0
+      changed_when: true
